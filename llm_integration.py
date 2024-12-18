@@ -1,5 +1,4 @@
 import openai
-openai.api_key = "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"
 
 # Function to interact with the LLM
 def ask_llm(question):
