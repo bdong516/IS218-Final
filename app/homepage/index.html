@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="./componets/calculator.css">
+</head>
+<body>
+    <div class="background-animation"></div>
+    <button class="theme-toggle">Change Theme</button>
+
+    <div class="welcome-message">
+        <h1>Welcome to my Calculator!</h1>
+    </div>
+
+    <div class="calculator">
+        <div class="display">
+            <div class="calculator__output" id="result">0</div>
+        </div>
+        <div class="calculator__keys">
+            <button class="calculator__key" data-key="clear">C</button>
+            <button class="calculator__key" data-key="backspace">←</button>
+            <button class="calculator__key calculator__key--operator" data-key="/">/</button>
+
+        
+            <button class="calculator__key" data-key="7">7</button>
+            <button class="calculator__key" data-key="8">8</button>
+            <button class="calculator__key" data-key="9">9</button>
+            <button class="calculator__key calculator__key--operator" data-key="*">*</button>
+            <button class="calculator__key" data-key="4">4</button>
+            <button class="calculator__key" data-key="5">5</button>
+            <button class="calculator__key" data-key="6">6</button>
+            <button class="calculator__key calculator__key--operator" data-key="-">-</button>
+            <button class="calculator__key" data-key="1">1</button>
+            <button class="calculator__key" data-key="2">2</button>
+            <button class="calculator__key" data-key="3">3</button>
+            <button class="calculator__key calculator__key--operator" data-key="+">+</button>
+            <button class="calculator__key" data-key="0">0</button>
+            <button class="calculator__key" data-key=".">.</button>
+            <button class="calculator__key calculator__key--enter" data-key="enter">=</button>
+        </div>
+        
+        
+    </div>
+
+    <script>
+        const output = document.getElementById('result');
+        let currentInput = '0';
+        let currentOperator = '';
+        let previousInput = '';
+        let currentTheme = 0;
+        const themes = [
+            { bg: '#1a1a1a, #4a148c', accent: '#9c27b0' },
+            { bg: '#004d40, #1de9b6', accent: '#00bfa5' },
+            { bg: '#b71c1c, #ff8a80', accent: '#ff5252' },
+            { bg: '#1a237e, #8c9eff', accent: '#536dfe' },
+            { bg: '#33691e, #b2ff59', accent: '#76ff03' }
+        ];
+
+        // Create particle effect
+        function createParticles(x, y) {
+            for (let i = 0; i < 5; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 10 + 5 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = x + (Math.random() - 0.5) * 50 + 'px';
+                particle.style.top = y + (Math.random() - 0.5) * 50 + 'px';
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // Add click effect to buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const rect = button.getBoundingClientRect();
+                createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                button.classList.add('animate__animated', 'animate__pulse');
+                setTimeout(() => button.classList.remove('animate__animated', 'animate__pulse'), 500);
+            });
+        });
+
+        // Theme toggling
+        document.querySelector('.theme-toggle').addEventListener('click', () => {
+            currentTheme = (currentTheme + 1) % themes.length;
+            const theme = themes[currentTheme];
+            document.querySelector('.background-animation').style.background =
+                `linear-gradient(45deg, ${theme.bg})`;
+            document.querySelectorAll('.operator').forEach(btn => {
+                btn.style.backgroundColor = theme.accent + '40';
+            });
+            document.querySelector('.calculator').classList.add('animate__animated', 'animate__flipInY');
+            setTimeout(() => document.querySelector('.calculator').classList.remove('animate__animated', 'animate__flipInY'), 1000);
+        });
+
+        const buttons = document.querySelectorAll('.calculator__key');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const key = button.dataset.key;
+                if (key === 'backspace') {
+                    currentInput = currentInput.length > 1
+                        ? currentInput.slice(0, -1)
+                        : '0';
+                    output.textContent = currentInput;
+                } else if (key === 'enter') {
+                    currentInput = eval(previousInput + currentOperator + currentInput).toString();
+                    output.textContent = currentInput;
+                    previousInput = '';
+                    currentOperator = '';
+                } else if (key === 'clear') {
+                    currentInput = '0';
+                    output.textContent = currentInput;
+                } else if (['+', '-', '*', '/'].includes(key)) {
+                    if (previousInput) {
+                        previousInput = currentInput;
+                        currentInput = '0';
+                        currentOperator = key;
+                    } else {
+                        currentOperator = key;
+                        previousInput = currentInput;
+                        currentInput = '0';
+                    }
+                } else if (key === '.') {
+                    if (!currentInput.includes('.')) {
+                        currentInput += '.';
+                    }
+                    output.textContent = currentInput;
+                } else {
+                    if (currentInput === '0') {
+                        currentInput = key;
+                    } else {
+                        currentInput += key;
+                    }
+                    output.textContent = currentInput;
+                }
+                
+            });
+        });
+    </script>
+</body>
+</html>
